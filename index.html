@@ -1,0 +1,1770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Simulator - Build Your Empire</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .panel h2 {
+            color: #1e3c72;
+            border-bottom: 3px solid #2a5298;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .panel h3 {
+            color: #2a5298;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 0.95em;
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: #2a5298;
+            text-align: right;
+        }
+
+        .positive {
+            color: #27ae60;
+        }
+
+        .negative {
+            color: #e74c3c;
+        }
+
+        .neutral {
+            color: #95a5a6;
+        }
+
+        .warning {
+            color: #f39c12;
+        }
+
+        .status-bar {
+            width: 100%;
+            height: 20px;
+            background: #ecf0f1;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .status-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.7em;
+            font-weight: bold;
+        }
+
+        .status-bar-fill.warning {
+            background: linear-gradient(90deg, #f39c12, #e67e22);
+        }
+
+        .status-bar-fill.danger {
+            background: linear-gradient(90deg, #e74c3c, #c0392b);
+        }
+
+        .decisions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .decision-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #2a5298;
+        }
+
+        .decision-item label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 0.9em;
+        }
+
+        .decision-item input,
+        .decision-item select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .decision-item input:focus,
+        .decision-item select:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+        }
+
+        .slider-value {
+            font-size: 0.85em;
+            color: #2a5298;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #2a5298;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e3c72;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(42, 82, 152, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .full-width {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .alerts-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            border-left: 4px solid;
+            font-size: 0.95em;
+        }
+
+        .alert:last-child {
+            margin-bottom: 0;
+        }
+
+        .alert-info {
+            background: #d6eaf8;
+            border-color: #3498db;
+            color: #1a5490;
+        }
+
+        .alert-success {
+            background: #d5f4e6;
+            border-color: #27ae60;
+            color: #145a32;
+        }
+
+        .alert-warning {
+            background: #fef5e7;
+            border-color: #f39c12;
+            color: #7d6608;
+        }
+
+        .alert-danger {
+            background: #fadbd8;
+            border-color: #e74c3c;
+            color: #78281f;
+        }
+
+        .market-competitors {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .competitor-card {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-size: 0.9em;
+        }
+
+        .competitor-card .name {
+            font-weight: bold;
+            color: #2a5298;
+            margin-bottom: 8px;
+        }
+
+        .competitor-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85em;
+            margin: 5px 0;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 12px 20px;
+            font-size: 0.95em;
+            cursor: pointer;
+            color: #95a5a6;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            color: #2a5298;
+            border-bottom-color: #2a5298;
+        }
+
+        .tab-btn:hover {
+            color: #2a5298;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-content h2 {
+            margin-bottom: 15px;
+            color: #1e3c72;
+        }
+
+        .modal-content p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .game-over {
+            text-align: center;
+        }
+
+        .game-over h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .game-over .stats {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+
+        .game-over .stat-line {
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .game-over .stat-line:last-child {
+            border-bottom: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+
+        table thead {
+            background: #f8f9fa;
+            border-bottom: 2px solid #ddd;
+        }
+
+        table th {
+            padding: 10px;
+            text-align: left;
+            font-weight: 600;
+            color: #2a5298;
+        }
+
+        table td {
+            padding: 10px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .event-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            border-left: 4px solid #3498db;
+            font-size: 0.9em;
+        }
+
+        .event-item.positive {
+            border-left-color: #27ae60;
+            background: #d5f4e6;
+        }
+
+        .event-item.negative {
+            border-left-color: #e74c3c;
+            background: #fadbd8;
+        }
+
+        .event-item .event-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #1a1a1a;
+        }
+
+        .event-item .event-desc {
+            color: #555;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .kpi-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ecf0f1 100%);
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        .kpi-card .kpi-label {
+            font-size: 0.8em;
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .kpi-card .kpi-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2a5298;
+        }
+
+        .kpi-card .kpi-change {
+            font-size: 0.75em;
+            margin-top: 5px;
+        }
+
+        .info-box {
+            background: #ecf0f1;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            margin: 10px 0;
+            border-left: 4px solid #3498db;
+        }
+
+        .time-indicator {
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: white;
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .tooltip {
+            display: inline-block;
+            position: relative;
+            cursor: help;
+            color: #3498db;
+            text-decoration: underline dotted;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #1a1a1a;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8em;
+            text-decoration: none;
+        }
+
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #1a1a1a transparent transparent transparent;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .decisions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .market-competitors {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .scroll-area {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .scroll-area::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .scroll-area::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .scroll-area::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+
+        .scroll-area::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💼 Business Simulator</h1>
+            <p>Build, manage, and grow your company through realistic business cycles</p>
+        </header>
+
+        <div class="time-indicator">
+            <span id="currentTime">Turn 1 • Month 1, Year 1</span>
+        </div>
+
+        <!-- Start Screen -->
+        <div id="startScreen" class="panel" style="text-align: center;">
+            <h2>Welcome to the Business Simulator</h2>
+            <p style="margin: 20px 0; font-size: 1.05em;">
+                You're about to start your entrepreneurial journey. Choose your industry and begin building your empire.
+            </p>
+            <div style="margin: 30px 0;">
+                <label style="display: block; margin-bottom: 15px; font-weight: bold;">Select Your Industry:</label>
+                <select id="industrySelect" style="width: 200px; padding: 10px; font-size: 1em; border: 2px solid #2a5298;">
+                    <option value="tech">Technology (High Risk, High Reward)</option>
+                    <option value="retail">Retail (Moderate Risk, Steady Income)</option>
+                    <option value="manufacturing">Manufacturing (Capital Intensive, Stable)</option>
+                    <option value="services">Services (Low Overhead, Fast Growth Possible)</option>
+                </select>
+            </div>
+            <div class="button-group" style="max-width: 300px; margin: 30px auto;">
+                <button class="btn-primary" onclick="startGame()">Start New Game</button>
+                <button class="btn-secondary" onclick="loadGame()">Load Game</button>
+            </div>
+        </div>
+
+        <!-- Main Game Screen -->
+        <div id="gameScreen" style="display: none;">
+            <!-- Financial Dashboard -->
+            <div class="main-grid">
+                <div class="panel">
+                    <h2>💰 Financial Dashboard</h2>
+                    <div class="stat-row">
+                        <span class="stat-label">Cash on Hand:</span>
+                        <span class="stat-value" id="cashDisplay">$50,000</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Total Revenue (YTD):</span>
+                        <span class="stat-value positive" id="revenueDisplay">$0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Total Expenses (YTD):</span>
+                        <span class="stat-value negative" id="expensesDisplay">$0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Net Income (YTD):</span>
+                        <span class="stat-value" id="netIncomeDisplay">$0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Total Assets:</span>
+                        <span class="stat-value" id="assetsDisplay">$50,000</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Total Debt:</span>
+                        <span class="stat-value negative" id="debtDisplay">$0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Equity:</span>
+                        <span class="stat-value" id="equityDisplay">$50,000</span>
+                    </div>
+
+                    <h3>Cash Flow Status</h3>
+                    <div class="status-bar">
+                        <div class="status-bar-fill" id="cashFlowBar" style="width: 100%;">Healthy</div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h2>📊 Key Performance Indicators</h2>
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-label">Gross Margin</div>
+                            <div class="kpi-value" id="grossMarginKPI">0%</div>
+                            <div class="kpi-change" id="grossMarginChange"></div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Op. Margin</div>
+                            <div class="kpi-value" id="opMarginKPI">0%</div>
+                            <div class="kpi-change" id="opMarginChange"></div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">ROE</div>
+                            <div class="kpi-value" id="roeKPI">0%</div>
+                            <div class="kpi-change" id="roeChange"></div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">CAC</div>
+                            <div class="kpi-value" id="cacKPI">$0</div>
+                            <div class="kpi-change" id="cacChange"></div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Inv. Turnover</div>
+                            <div class="kpi-value" id="invTurnoverKPI">0x</div>
+                            <div class="kpi-change" id="invTurnoverChange"></div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">D/E Ratio</div>
+                            <div class="kpi-value" id="deRatioKPI">0.0x</div>
+                            <div class="kpi-change" id="deRatioChange"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Operational Dashboard -->
+            <div class="main-grid">
+                <div class="panel">
+                    <h2>🏭 Operations</h2>
+                    <h3>Production</h3>
+                    <div class="stat-row">
+                        <span class="stat-label">Monthly Capacity:</span>
+                        <span class="stat-value" id="capacityDisplay">0 units</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Current Production:</span>
+                        <span class="stat-value" id="productionDisplay">0 units</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Capacity Utilization:</span>
+                        <span class="stat-value" id="utilizationDisplay">0%</span>
+                    </div>
+
+                    <h3>Inventory</h3>
+                    <div class="stat-row">
+                        <span class="stat-label">Current Inventory:</span>
+                        <span class="stat-value" id="inventoryDisplay">0 units</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Carrying Cost (monthly):</span>
+                        <span class="stat-value negative" id="carryingCostDisplay">$0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Inventory Turnover:</span>
+                        <span class="stat-value" id="turnoverDisplay">0x</span>
+                    </div>
+
+                    <h3>Supply Chain</h3>
+                    <div class="stat-row">
+                        <span class="stat-label">Material Cost/Unit:</span>
+                        <span class="stat-value" id="materialCostDisplay">$0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Supplier Reliability:</span>
+                        <span class="stat-value" id="reliabilityDisplay">Good</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Production Lead Time:</span>
+                        <span class="stat-value" id="leadTimeDisplay">1 month</span>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h2>👥 Human Resources</h2>
+                    <div class="stat-row">
+                        <span class="stat-label">Employees:</span>
+                        <span class="stat-value" id="employeesDisplay">5</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Pending Hires:</span>
+                        <span class="stat-value neutral" id="pendingHiresDisplay">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Monthly Payroll:</span>
+                        <span class="stat-value negative" id="payrollDisplay">$0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Avg. Salary:</span>
+                        <span class="stat-value" id="avgSalaryDisplay">$0</span>
+                    </div>
+
+                    <h3>Employee Health</h3>
+                    <div class="stat-row">
+                        <span class="stat-label">Morale:</span>
+                        <span class="stat-value" id="moraleDisplay">Good</span>
+                    </div>
+                    <div class="status-bar">
+                        <div class="status-bar-fill" id="moraleBar" style="width: 75%; background: linear-gradient(90deg, #3498db, #2980b9);">75%</div>
+                    </div>
+                    <div class="stat-row" style="margin-top: 10px;">
+                        <span class="stat-label">Turnover Risk:</span>
+                        <span class="stat-value" id="turnoverRiskDisplay">Low</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Productivity:</span>
+                        <span class="stat-value" id="productivityDisplay">100%</span>
+                    </div>
+
+                    <h3>Training</h3>
+                    <div class="stat-row">
+                        <span class="stat-label">Avg. Skill Level:</span>
+                        <span class="stat-value" id="skillLevelDisplay">Novice</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market Dashboard -->
+            <div class="main-grid">
+                <div class="panel">
+                    <h2>📈 Sales & Marketing</h2>
+                    <div class="stat-row">
+                        <span class="stat-label">Current Price/Unit:</span>
+                        <span class="stat-value" id="priceDisplay">$0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Monthly Units Sold:</span>
+                        <span class="stat-value" id="unitsSoldDisplay">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Customer Base:</span>
+                        <span class="stat-value" id="customersDisplay">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Customer Churn Rate:</span>
+                        <span class="stat-value" id="churnRateDisplay">0%</span>
+                    </div>
+
+                    <h3>Marketing</h3>
+                    <div class="stat-row">
+                        <span class="stat-label">Marketing Budget (monthly):</span>
+                        <span class="stat-value negative" id="marketingBudgetDisplay">$0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Brand Reputation:</span>
+                        <span class="stat-value" id="reputationDisplay">Unknown</span>
+                    </div>
+                    <div class="status-bar">
+                        <div class="status-bar-fill" id="reputationBar" style="width: 10%; background: linear-gradient(90deg, #95a5a6, #7f8c8d);">10%</div>
+                    </div>
+
+                    <h3>Market Conditions</h3>
+                    <div class="stat-row">
+                        <span class="stat-label">Market Size:</span>
+                        <span class="stat-value" id="marketSizeDisplay">0 units/month</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Market Growth:</span>
+                        <span class="stat-value" id="marketGrowthDisplay">0%</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Your Market Share:</span>
+                        <span class="stat-value" id="marketShareDisplay">0%</span>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h2>🎯 Competitors</h2>
+                    <div class="market-competitors" id="competitorsContainer">
+                        <!-- Competitors will be rendered here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- R&D Dashboard -->
+            <div class="main-grid">
+                <div class="panel">
+                    <h2>🔬 Research & Development</h2>
+                    <div class="stat-row">
+                        <span class="stat-label">R&D Budget (monthly):</span>
+                        <span class="stat-value" id="rdBudgetDisplay">$0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Innovation Level:</span>
+                        <span class="stat-value" id="innovationDisplay">Low</span>
+                    </div>
+                    <div class="status-bar">
+                        <div class="status-bar-fill" id="innovationBar" style="width: 20%; background: linear-gradient(90deg, #9b59b6, #8e44ad);">20%</div>
+                    </div>
+                    <div class="stat-row" style="margin-top: 10px;">
+                        <span class="stat-label">Product Competitiveness:</span>
+                        <span class="stat-value" id="competitivenessDisplay">Average</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Time to Product Iteration:</span>
+                        <span class="stat-value neutral" id="iterationTimeDisplay">3 months</span>
+                    </div>
+
+                    <h3>Active Projects</h3>
+                    <div class="scroll-area" id="rdProjectsContainer" style="margin-top: 10px;">
+                        <p style="color: #95a5a6; text-align: center; padding: 20px 0;">No active R&D projects</p>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h2>⚠️ Risks & Events</h2>
+                    <div class="info-box">
+                        Recent events and alerts will appear here. Stay alert to changing market conditions and unexpected events!
+                    </div>
+                    <div class="scroll-area" id="eventsContainer" style="margin-top: 10px;">
+                        <p style="color: #95a5a6; text-align: center; padding: 20px 0;">No recent events</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Decisions Panel -->
+            <div class="panel">
+                <h2>🎮 Monthly Decisions</h2>
+                <p style="margin-bottom: 15px; color: #666; font-size: 0.9em;">
+                    Make strategic decisions for the upcoming month. Your choices will have measurable consequences.
+                </p>
+
+                <div class="decisions-grid">
+                    <div class="decision-item">
+                        <label>
+                            <span class="tooltip">
+                                Product Price/Unit
+                                <span class="tooltiptext">Affects demand - higher prices reduce quantity sold but increase margin. Competitors react to your pricing.</span>
+                            </span>
+                        </label>
+                        <input type="number" id="priceDecision" min="1" step="1" value="50">
+                        <div class="slider-value">$<span id="priceValue">50</span>/unit</div>
+                    </div>
+
+                    <div class="decision-item">
+                        <label>
+                            <span class="tooltip">
+                                Production Volume
+                                <span class="tooltiptext">Units to produce this month. Must be ≤ capacity. Excess inventory costs money to store.</span>
+                            </span>
+                        </label>
+                        <input type="number" id="productionDecision" min="0" step="10" value="0">
+                        <div class="slider-value"><span id="productionValue">0</span> units</div>
+                    </div>
+
+                    <div class="decision-item">
+                        <label>
+                            <span class="tooltip">
+                                Hire Employees
+                                <span class="tooltiptext">Number of employees to hire. Takes 1 month to recruit. New hires start at entry salary.</span>
+                            </span>
+                        </label>
+                        <input type="number" id="hireDecision" min="0" max="20" step="1" value="0">
+                        <div class="slider-value"><span id="hireValue">0</span> people</div>
+                    </div>
+
+                    <div class="decision-item">
+                        <label>
+                            <span class="tooltip">
+                                Marketing Spend
+                                <span class="tooltiptext">Monthly marketing budget. Increases brand awareness and reduces CAC. ROI compounds over time.</span>
+                            </span>
+                        </label>
+                        <input type="number" id="marketingDecision" min="0" step="100" value="0">
+                        <div class="slider-value">$<span id="marketingValue">0</span></div>
+                    </div>
+
+                    <div class="decision-item">
+                        <label>
+                            <span class="tooltip">
+                                R&D Investment
+                                <span class="tooltiptext">Monthly R&D spend. Improves product competitiveness with delayed effect (takes time to develop).</span>
+                            </span>
+                        </label>
+                        <input type="number" id="rdDecision" min="0" step="100" value="0">
+                        <div class="slider-value">$<span id="rdValue">0</span></div>
+                    </div>
+
+                    <div class="decision-item">
+                        <label>
+                            <span class="tooltip">
+                                Salary Adjustment
+                                <span class="tooltiptext">Percentage change to all salaries. +10% boosts morale; -10% hurts it but saves money. Affects retention.</span>
+                            </span>
+                        </label>
+                        <input type="number" id="salaryDecision" min="-50" max="50" step="5" value="0">
+                        <div class="slider-value"><span id="salaryValue">0</span>%</div>
+                    </div>
+
+                    <div class="decision-item">
+                        <label>
+                            <span class="tooltip">
+                                Debt/Borrowing
+                                <span class="tooltiptext">Take out a loan (positive) or pay down debt (negative). Interest accrues monthly.</span>
+                            </span>
+                        </label>
+                        <input type="number" id="debtDecision" step="1000" value="0">
+                        <div class="slider-value">$<span id="debtValue">0</span></div>
+                    </div>
+
+                    <div class="decision-item">
+                        <label>
+                            <span class="tooltip">
+                                Capacity Expansion
+                                <span class="tooltiptext">Invest in equipment/infrastructure. Takes 1 month to implement. Increases production capacity.</span>
+                            </span>
+                        </label>
+                        <input type="number" id="capexDecision" min="0" step="500" value="0">
+                        <div class="slider-value">$<span id="capexValue">0</span></div>
+                    </div>
+                </div>
+
+                <div class="info-box" style="margin-top: 20px;">
+                    <strong>Projected Monthly Change:</strong> 
+                    <span id="projectedChange">$0</span> (before other operations)
+                </div>
+
+                <div class="button-group" style="margin-top: 20px;">
+                    <button class="btn-primary" onclick="executeMonth()">Execute Month</button>
+                    <button class="btn-secondary" onclick="saveGame()">Save Game</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Modal -->
+        <div id="gameOverModal" class="modal">
+            <div class="modal-content game-over">
+                <h2 id="gameOverTitle">Game Over</h2>
+                <div id="gameOverStats" class="stats"></div>
+                <div class="modal-buttons">
+                    <button class="btn-primary" onclick="location.reload()">Play Again</button>
+                    <button class="btn-secondary" onclick="loadGame()">Load Saved Game</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== GAME ENGINE =====
+        
+        class BusinessSimulator {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.turn = 1;
+                this.year = 1;
+                this.month = 1;
+                this.industry = 'tech';
+
+                // Financial
+                this.cash = 50000;
+                this.totalRevenue = 0;
+                this.totalExpenses = 0;
+                this.monthlyHistory = [];
+                this.debt = 0;
+                this.equipment = 0;
+                this.interestRate = 0.08;
+                this.taxRate = 0.21;
+
+                // Operations
+                this.baseCapacity = this.getInitialCapacity();
+                this.currentCapacity = this.baseCapacity;
+                this.inventory = 0;
+                this.productionThisMonth = 0;
+                this.baseMaterialCost = this.getInitialMaterialCost();
+                this.supplierReliability = 0.95;
+                this.productionLeadTime = 1;
+                this.wasteRate = 0.02;
+
+                // HR
+                this.employees = 5;
+                this.pendingHires = 0;
+                this.hiresMonthsRemaining = 0;
+                this.baseSalary = 3000;
+                this.morale = 75;
+                this.turnoverRisk = 0.1;
+                this.skillLevel = 20;
+
+                // Sales & Marketing
+                this.price = 50;
+                this.unitsSold = 0;
+                this.customers = 0;
+                this.customerChurn = 0.05;
+                this.marketingBudget = 0;
+                this.brandReputation = 10;
+                this.customerAcquisitionCost = 50;
+
+                // Market
+                this.marketSize = this.getInitialMarketSize();
+                this.marketGrowth = 0.03;
+                this.seasonalFactor = 1.0;
+                this.economicCycle = 'normal';
+                this.marketShare = 0;
+
+                // R&D
+                this.rdBudget = 0;
+                this.innovationLevel = 20;
+                this.productCompetitiveness = 50;
+                this.rdProjects = [];
+
+                // Competitors
+                this.competitors = this.generateCompetitors();
+
+                // Events
+                this.recentEvents = [];
+                this.alerts = [];
+
+                // History
+                this.gameHistory = [];
+            }
+
+            getInitialCapacity() {
+                const caps = { tech: 1000, retail: 500, manufacturing: 2000, services: 200 };
+                return caps[this.industry] || 1000;
+            }
+
+            getInitialMaterialCost() {
+                const costs = { tech: 15, retail: 20, manufacturing: 25, services: 10 };
+                return costs[this.industry] || 15;
+            }
+
+            getInitialMarketSize() {
+                const sizes = { tech: 5000, retail: 2000, manufacturing: 3000, services: 1000 };
+                return sizes[this.industry] || 5000;
+            }
+
+            generateCompetitors() {
+                const names = ['TechCorp', 'GlobalSys', 'Premier Inc', 'EliteWorks', 'VenturePlus'];
+                const competitors = [];
+                
+                for (let i = 0; i < 3; i++) {
+                    competitors.push({
+                        name: names[i],
+                        price: 50 + (Math.random() - 0.5) * 20,
+                        marketShare: 0.15,
+                        efficiency: 0.8 + Math.random() * 0.2,
+                        aggression: 0.5 + Math.random() * 0.5
+                    });
+                }
+                return competitors;
+            }
+
+            executeMonth(decisions) {
+                this.processDecisions(decisions);
+                this.updateMarketConditions();
+                this.handleProduction(decisions.production);
+                this.handleSalesAndRevenue();
+                this.handleHROperations(decisions.salary);
+                this.triggerEvents();
+
+                const monthRevenue = this.unitsSold * this.price;
+                const monthExpenses = this.calculateMonthlyExpenses(decisions);
+                const monthNetIncome = monthRevenue - monthExpenses;
+                
+                this.cash += monthNetIncome;
+                this.totalRevenue += monthRevenue;
+                this.totalExpenses += monthExpenses;
+
+                this.monthlyHistory.push({
+                    turn: this.turn,
+                    revenue: monthRevenue,
+                    expenses: monthExpenses
+                });
+
+                this.advanceMonth();
+                return this.checkGameStatus();
+            }
+
+            processDecisions(decisions) {
+                this.price = Math.max(1, decisions.price);
+                const maxProduction = Math.min(decisions.production, this.currentCapacity);
+                this.productionThisMonth = Math.max(0, maxProduction);
+
+                if (decisions.hire > 0) {
+                    this.pendingHires = decisions.hire;
+                    this.hiresMonthsRemaining = 1;
+                }
+
+                this.marketingBudget = Math.max(0, decisions.marketing);
+                this.rdBudget = Math.max(0, decisions.rd);
+
+                if (decisions.debt > 0) {
+                    this.debt += decisions.debt;
+                    this.cash += decisions.debt;
+                } else if (decisions.debt < 0) {
+                    const repayment = Math.min(Math.abs(decisions.debt), this.debt, this.cash);
+                    this.debt -= repayment;
+                    this.cash -= repayment;
+                }
+
+                if (decisions.capex > 0) {
+                    this.equipment += decisions.capex;
+                    this.cash -= decisions.capex;
+                    this.currentCapacity = this.baseCapacity + (this.equipment / 1000);
+                }
+            }
+
+            updateMarketConditions() {
+                this.marketSize *= (1 + this.marketGrowth);
+
+                const month = this.month;
+                if (month >= 11 || month === 12) {
+                    this.seasonalFactor = 1.3;
+                } else if (month >= 6 && month <= 8) {
+                    this.seasonalFactor = 1.1;
+                } else {
+                    this.seasonalFactor = 0.95;
+                }
+
+                const cyclePhase = (this.turn % 20) / 20;
+                if (cyclePhase < 0.3) {
+                    this.economicCycle = 'boom';
+                    this.marketGrowth = 0.04;
+                } else if (cyclePhase < 0.6) {
+                    this.economicCycle = 'normal';
+                    this.marketGrowth = 0.03;
+                } else if (cyclePhase < 0.8) {
+                    this.economicCycle = 'slowdown';
+                    this.marketGrowth = 0.01;
+                } else {
+                    this.economicCycle = 'recession';
+                    this.marketGrowth = -0.02;
+                    this.marketSize *= 0.98;
+                }
+
+                this.competitors.forEach(comp => {
+                    const adjustmentFactor = 0.95 + Math.random() * 0.1;
+                    comp.price *= adjustmentFactor;
+                    if (this.economicCycle === 'recession') {
+                        comp.aggression = Math.min(1, comp.aggression + 0.1);
+                    }
+                });
+            }
+
+            handleProduction(production) {
+                const wastedUnits = Math.floor(production * this.wasteRate);
+                const actualProduced = Math.max(0, production - wastedUnits);
+                this.inventory += actualProduced;
+            }
+
+            handleSalesAndRevenue() {
+                const priceRatio = this.price / 50;
+                const demandMultiplier = Math.pow(0.9, priceRatio);
+                
+                let baseDemand = this.marketSize * this.seasonalFactor;
+                baseDemand *= (1 + Math.random() * 0.1 - 0.05);
+                
+                const reputationBoost = 1 + (this.brandReputation / 100) * 0.5;
+                baseDemand *= reputationBoost;
+
+                let competitorPressure = 0;
+                this.competitors.forEach(comp => {
+                    if (comp.price < this.price * 0.8) {
+                        competitorPressure += 0.1;
+                    }
+                });
+                baseDemand *= (1 - competitorPressure);
+
+                let demand = baseDemand * demandMultiplier;
+                this.unitsSold = Math.min(demand, this.inventory);
+                this.inventory -= this.unitsSold;
+
+                const newCustomers = (this.unitsSold / 10) * (1 + this.brandReputation / 100);
+                const repBudgetBoost = (this.marketingBudget / 100) * (1 + this.skillLevel / 100);
+                
+                this.customers += (newCustomers + repBudgetBoost);
+                const churnAmount = this.customers * this.customerChurn;
+                this.customers = Math.max(0, this.customers - churnAmount);
+
+                this.marketShare = (this.unitsSold / this.marketSize) * 100;
+                const repGain = (this.marketingBudget / 1000) * 0.5;
+                this.brandReputation = Math.min(100, this.brandReputation + repGain);
+            }
+
+            handleHROperations(salaryAdjustment) {
+                if (this.hiresMonthsRemaining > 0) {
+                    this.hiresMonthsRemaining--;
+                    if (this.hiresMonthsRemaining === 0) {
+                        this.employees += this.pendingHires;
+                        this.pendingHires = 0;
+                    }
+                }
+
+                if (salaryAdjustment !== 0) {
+                    this.baseSalary *= (1 + salaryAdjustment / 100);
+                    if (salaryAdjustment > 0) {
+                        this.morale = Math.min(100, this.morale + Math.abs(salaryAdjustment));
+                    } else {
+                        this.morale = Math.max(0, this.morale - Math.abs(salaryAdjustment) * 1.5);
+                    }
+                }
+
+                const baseChurn = 0.05;
+                const moraleModifier = (100 - this.morale) / 100;
+                this.turnoverRisk = baseChurn + (moraleModifier * 0.2);
+
+                const departures = Math.floor(this.employees * this.turnoverRisk);
+                this.employees = Math.max(1, this.employees - departures);
+
+                this.skillLevel = Math.min(100, this.skillLevel + (this.rdBudget / 5000));
+            }
+
+            calculateMonthlyExpenses(decisions) {
+                let expenses = 0;
+                const cogs = this.unitsSold * this.baseMaterialCost;
+                expenses += cogs;
+
+                const payroll = this.employees * this.baseSalary;
+                expenses += payroll;
+
+                const carryingCost = this.inventory * this.baseMaterialCost * 0.02;
+                expenses += carryingCost;
+
+                expenses += decisions.marketing;
+                expenses += decisions.rd;
+                expenses += this.equipment * 0.00833;
+                
+                const facilitiesCost = this.employees * 200;
+                expenses += facilitiesCost;
+
+                if (this.debt > 0) {
+                    const monthlyInterest = (this.debt * this.interestRate) / 12;
+                    expenses += monthlyInterest;
+                }
+
+                return expenses;
+            }
+
+            triggerEvents() {
+                this.recentEvents = [];
+                const eventChance = 0.3;
+
+                if (Math.random() < eventChance) {
+                    const eventTypes = ['equipmentFailure', 'supplyDisruption', 'staffDeparture'];
+                    const eventType = eventTypes[Math.floor(Math.random() * eventTypes.length)];
+                    this.createEvent(eventType);
+                }
+            }
+
+            createEvent(type) {
+                const events = {
+                    equipmentFailure: {
+                        title: '⚠️ Equipment Failure',
+                        desc: 'Production machine failed unexpectedly.',
+                        effect: () => { this.currentCapacity *= 0.85; this.cash -= 5000; },
+                        impact: 'Capacity reduced 15%, repair cost $5,000'
+                    },
+                    supplyDisruption: {
+                        title: '📦 Supply Disruption',
+                        desc: 'Supplier shortage due to unexpected demand.',
+                        effect: () => { this.baseMaterialCost *= 1.2; },
+                        impact: 'Material costs increase 20%'
+                    },
+                    staffDeparture: {
+                        title: '👤 Staff Departure',
+                        desc: 'Senior employee departed for another company.',
+                        effect: () => { this.employees = Math.max(1, this.employees - 2); this.morale -= 10; },
+                        impact: 'Lost 2 employees, morale -10'
+                    }
+                };
+
+                const event = events[type];
+                if (event) {
+                    event.effect();
+                    this.recentEvents.push(event);
+                }
+            }
+
+            checkGameStatus() {
+                if (this.cash < 0) {
+                    return { status: 'bankrupt', message: 'Your company ran out of cash!' };
+                }
+
+                const totalAssets = this.cash + this.inventory * this.baseMaterialCost + this.equipment;
+                if (this.debt > totalAssets) {
+                    return { status: 'insolvent', message: 'Your liabilities exceed assets. Company is insolvent.' };
+                }
+
+                if (this.totalRevenue > 1000000 && this.morale > 70 && this.marketShare > 20) {
+                    return { status: 'success', message: 'Congratulations! You built a thriving business!' };
+                }
+
+                if (this.totalRevenue > 500000 && Math.random() < 0.1) {
+                    const offerPrice = this.totalRevenue * 2.5;
+                    return { status: 'acquired', message: `Acquisition offer: $${Math.floor(offerPrice).toLocaleString()}!` };
+                }
+
+                return { status: 'ongoing', message: null };
+            }
+
+            advanceMonth() {
+                this.turn++;
+                this.month++;
+                if (this.month > 12) {
+                    this.month = 1;
+                    this.year++;
+                }
+            }
+
+            save() {
+                const gameState = {
+                    turn: this.turn, year: this.year, month: this.month, industry: this.industry,
+                    cash: this.cash, totalRevenue: this.totalRevenue, totalExpenses: this.totalExpenses,
+                    debt: this.debt, equipment: this.equipment, employees: this.employees,
+                    inventory: this.inventory, customers: this.customers, price: this.price,
+                    marketingBudget: this.marketingBudget, brandReputation: this.brandReputation,
+                    innovationLevel: this.innovationLevel, morale: this.morale, skillLevel: this.skillLevel
+                };
+                localStorage.setItem('businessSimulatorSave', JSON.stringify(gameState));
+                return true;
+            }
+
+            load() {
+                const saved = localStorage.getItem('businessSimulatorSave');
+                if (saved) {
+                    try {
+                        const state = JSON.parse(saved);
+                        Object.assign(this, state);
+                        return true;
+                    } catch (e) {
+                        return false;
+                    }
+                }
+                return false;
+            }
+
+            hasSave() {
+                return localStorage.getItem('businessSimulatorSave') !== null;
+            }
+        }
+
+        // ===== UI CONTROLLER =====
+
+        let game = new BusinessSimulator();
+
+        function startGame() {
+            game = new BusinessSimulator();
+            const industry = document.getElementById('industrySelect')?.value || 'tech';
+            game.industry = industry;
+            game.reset();
+            updateUI();
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+        }
+
+        function loadGame() {
+            game = new BusinessSimulator();
+            if (game.load()) {
+                updateUI();
+                document.getElementById('startScreen').style.display = 'none';
+                document.getElementById('gameScreen').style.display = 'block';
+            } else {
+                alert('No saved game found!');
+            }
+        }
+
+        function saveGame() {
+            if (game.save()) {
+                alert('Game saved successfully!');
+            }
+        }
+
+        function updateUI() {
+            updateFinancials();
+            updateKPIs();
+            updateOperations();
+            updateHR();
+            updateMarket();
+            updateRD();
+            updateEvents();
+            updateDecisionDisplay();
+            updateTime();
+        }
+
+        function updateTime() {
+            document.getElementById('currentTime').textContent = 
+                `Turn ${game.turn} • Month ${game.month}, Year ${game.year}`;
+        }
+
+        function updateFinancials() {
+            const formatCurrency = (val) => `$${Math.floor(val).toLocaleString()}`;
+            document.getElementById('cashDisplay').textContent = formatCurrency(game.cash);
+            document.getElementById('revenueDisplay').textContent = formatCurrency(game.totalRevenue);
+            document.getElementById('expensesDisplay').textContent = formatCurrency(game.totalExpenses);
+            document.getElementById('netIncomeDisplay').textContent = formatCurrency(game.totalRevenue - game.totalExpenses);
+            
+            const totalAssets = game.cash + game.inventory * game.baseMaterialCost + game.equipment;
+            document.getElementById('assetsDisplay').textContent = formatCurrency(totalAssets);
+            document.getElementById('debtDisplay').textContent = formatCurrency(game.debt);
+            document.getElementById('equityDisplay').textContent = formatCurrency(totalAssets - game.debt);
+
+            let status = 'Healthy';
+            let barColor = '#27ae60';
+            if (game.cash < 10000) {
+                status = 'Critical';
+                barColor = '#e74c3c';
+            } else if (game.cash < 50000) {
+                status = 'Tight';
+                barColor = '#f39c12';
+            }
+            document.getElementById('cashFlowBar').textContent = status;
+            document.getElementById('cashFlowBar').style.background = barColor;
+        }
+
+        function updateKPIs() {
+            const monthlyRevenue = game.unitsSold * game.price || 1;
+            const monthlyCogs = game.unitsSold * game.baseMaterialCost || 1;
+            const monthlyOpex = game.employees * game.baseSalary + game.marketingBudget + game.rdBudget;
+
+            const grossMargin = monthlyRevenue > 0 ? ((monthlyRevenue - monthlyCogs) / monthlyRevenue) * 100 : 0;
+            const opMargin = monthlyRevenue > 0 ? ((monthlyRevenue - monthlyCogs - monthlyOpex) / monthlyRevenue) * 100 : 0;
+
+            const totalAssets = game.cash + game.inventory * game.baseMaterialCost + game.equipment;
+            const equity = totalAssets - game.debt;
+            const roe = equity > 0 ? ((game.totalRevenue - game.totalExpenses) / equity) * 100 : 0;
+
+            const totalCustomerCost = game.marketingBudget * game.turn;
+            const cac = game.customers > 0 ? totalCustomerCost / game.customers : 0;
+
+            const avgInventory = game.inventory / 2;
+            const invTurnover = avgInventory > 0 ? game.unitsSold / avgInventory : 0;
+
+            const deRatio = equity > 0 ? game.debt / equity : 0;
+
+            document.getElementById('grossMarginKPI').textContent = `${grossMargin.toFixed(1)}%`;
+            document.getElementById('opMarginKPI').textContent = `${opMargin.toFixed(1)}%`;
+            document.getElementById('roeKPI').textContent = `${roe.toFixed(1)}%`;
+            document.getElementById('cacKPI').textContent = `$${Math.floor(cac)}`;
+            document.getElementById('invTurnoverKPI').textContent = `${invTurnover.toFixed(1)}x`;
+            document.getElementById('deRatioKPI').textContent = `${deRatio.toFixed(1)}x`;
+        }
+
+        function updateOperations() {
+            const util = game.currentCapacity > 0 ? (game.productionThisMonth / game.currentCapacity * 100) : 0;
+
+            document.getElementById('capacityDisplay').textContent = `${Math.floor(game.currentCapacity)} units`;
+            document.getElementById('productionDisplay').textContent = `${Math.floor(game.productionThisMonth)} units`;
+            document.getElementById('utilizationDisplay').textContent = `${util.toFixed(1)}%`;
+            document.getElementById('inventoryDisplay').textContent = `${Math.floor(game.inventory)} units`;
+            document.getElementById('carryingCostDisplay').textContent = `$${Math.floor(game.inventory * game.baseMaterialCost * 0.02).toLocaleString()}`;
+            
+            const invTurn = game.inventory > 0 ? game.unitsSold / (game.inventory / 2) : 0;
+            document.getElementById('turnoverDisplay').textContent = `${invTurn.toFixed(1)}x`;
+            
+            document.getElementById('materialCostDisplay').textContent = `$${game.baseMaterialCost.toFixed(2)}`;
+            document.getElementById('reliabilityDisplay').textContent = `${(game.supplierReliability * 100).toFixed(0)}%`;
+            document.getElementById('leadTimeDisplay').textContent = `${game.productionLeadTime} month(s)`;
+        }
+
+        function updateHR() {
+            document.getElementById('employeesDisplay').textContent = `${game.employees}`;
+            document.getElementById('pendingHiresDisplay').textContent = `${game.pendingHires}`;
+            document.getElementById('payrollDisplay').textContent = `$${Math.floor(game.employees * game.baseSalary).toLocaleString()}`;
+            document.getElementById('avgSalaryDisplay').textContent = `$${Math.floor(game.baseSalary).toLocaleString()}`;
+
+            const moraleStatus = game.morale > 75 ? 'Excellent' : game.morale > 50 ? 'Good' : game.morale > 25 ? 'Fair' : 'Poor';
+            document.getElementById('moraleDisplay').textContent = moraleStatus;
+            
+            const moralePercent = Math.min(100, Math.max(0, game.morale));
+            document.getElementById('moraleBar').style.width = `${moralePercent}%`;
+            document.getElementById('moraleBar').textContent = `${moralePercent.toFixed(0)}%`;
+
+            const turnoverRiskPercent = (game.turnoverRisk * 100).toFixed(1);
+            const riskLevel = game.turnoverRisk < 0.1 ? 'Low' : game.turnoverRisk < 0.2 ? 'Medium' : 'High';
+            document.getElementById('turnoverRiskDisplay').textContent = `${riskLevel} (${turnoverRiskPercent}%)`;
+            
+            document.getElementById('productivityDisplay').textContent = `${(100 * (game.morale / 100) * (1 + game.skillLevel / 100)).toFixed(0)}%`;
+
+            const skillStatus = game.skillLevel > 80 ? 'Expert' : game.skillLevel > 60 ? 'Advanced' : game.skillLevel > 40 ? 'Intermediate' : 'Novice';
+            document.getElementById('skillLevelDisplay').textContent = skillStatus;
+        }
+
+        function updateMarket() {
+            document.getElementById('priceDisplay').textContent = `$${game.price.toFixed(2)}`;
+            document.getElementById('unitsSoldDisplay').textContent = `${Math.floor(game.unitsSold)}`;
+            document.getElementById('customersDisplay').textContent = `${Math.floor(game.customers)}`;
+            document.getElementById('churnRateDisplay').textContent = `${(game.customerChurn * 100).toFixed(1)}%`;
+            document.getElementById('marketingBudgetDisplay').textContent = `$${Math.floor(game.marketingBudget).toLocaleString()}`;
+
+            const repStatus = game.brandReputation > 75 ? 'Excellent' : game.brandReputation > 50 ? 'Good' : game.brandReputation > 25 ? 'Fair' : 'Unknown';
+            document.getElementById('reputationDisplay').textContent = repStatus;
+            
+            const repPercent = Math.min(100, game.brandReputation);
+            document.getElementById('reputationBar').style.width = `${repPercent}%`;
+            document.getElementById('reputationBar').textContent = `${repPercent.toFixed(0)}%`;
+
+            document.getElementById('marketSizeDisplay').textContent = `${Math.floor(game.marketSize)} units/month`;
+            document.getElementById('marketGrowthDisplay').textContent = `${(game.marketGrowth * 100).toFixed(1)}%`;
+            document.getElementById('marketShareDisplay').textContent = `${game.marketShare.toFixed(2)}%`;
+
+            const compContainer = document.getElementById('competitorsContainer');
+            compContainer.innerHTML = '';
+            game.competitors.forEach(comp => {
+                const card = document.createElement('div');
+                card.className = 'competitor-card';
+                card.innerHTML = `
+                    <div class="name">${comp.name}</div>
+                    <div class="competitor-stats">
+                        <span>Price:</span>
+                        <span>$${comp.price.toFixed(2)}</span>
+                    </div>
+                    <div class="competitor-stats">
+                        <span>Share:</span>
+                        <span>${(comp.marketShare * 100).toFixed(1)}%</span>
+                    </div>
+                    <div class="competitor-stats">
+                        <span>Efficiency:</span>
+                        <span>${(comp.efficiency * 100).toFixed(0)}%</span>
+                    </div>
+                `;
+                compContainer.appendChild(card);
+            });
+        }
+
+        function updateRD() {
+            const innovStatus = game.innovationLevel > 75 ? 'Cutting-edge' : game.innovationLevel > 50 ? 'Advanced' : game.innovationLevel > 25 ? 'Moderate' : 'Basic';
+            const compStatus = game.productCompetitiveness > 75 ? 'Superior' : game.productCompetitiveness > 50 ? 'Competitive' : 'Average';
+
+            document.getElementById('rdBudgetDisplay').textContent = `$${Math.floor(game.rdBudget).toLocaleString()}`;
+            document.getElementById('innovationDisplay').textContent = innovStatus;
+            
+            const innovPercent = Math.min(100, game.innovationLevel);
+            document.getElementById('innovationBar').style.width = `${innovPercent}%`;
+            document.getElementById('innovationBar').textContent = `${innovPercent.toFixed(0)}%`;
+            
+            document.getElementById('competitivenessDisplay').textContent = compStatus;
+            document.getElementById('iterationTimeDisplay').textContent = `${Math.max(1, 3 - Math.floor(game.innovationLevel / 30))} months`;
+        }
+
+        function updateEvents() {
+            const container = document.getElementById('eventsContainer');
+            if (game.recentEvents.length === 0) {
+                container.innerHTML = '<p style="color: #95a5a6; text-align: center; padding: 20px 0;">No recent events</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            game.recentEvents.slice(-5).forEach(event => {
+                const item = document.createElement('div');
+                item.className = 'event-item';
+                item.innerHTML = `
+                    <div class="event-title">${event.title}</div>
+                    <div class="event-desc">${event.desc}</div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function updateDecisionDisplay() {
+            document.getElementById('priceDecision').value = game.price;
+            document.getElementById('priceValue').textContent = game.price;
+        }
+
+        // ===== DECISION HANDLING =====
+
+        function getDecisions() {
+            return {
+                price: parseFloat(document.getElementById('priceDecision').value) || 50,
+                production: parseFloat(document.getElementById('productionDecision').value) || 0,
+                hire: parseFloat(document.getElementById('hireDecision').value) || 0,
+                marketing: parseFloat(document.getElementById('marketingDecision').value) || 0,
+                rd: parseFloat(document.getElementById('rdDecision').value) || 0,
+                salary: parseFloat(document.getElementById('salaryDecision').value) || 0,
+                debt: parseFloat(document.getElementById('debtDecision').value) || 0,
+                capex: parseFloat(document.getElementById('capexDecision').value) || 0
+            };
+        }
+
+        function executeMonth() {
+            const decisions = getDecisions();
+
+            if (decisions.production > game.currentCapacity) {
+                alert('Production exceeds capacity!');
+                return;
+            }
+
+            const result = game.executeMonth(decisions);
+            updateUI();
+
+            if (result.status !== 'ongoing') {
+                endGame(result);
+            }
+        }
+
+        function endGame(result) {
+            const stats = `
+                <div class="stat-line">
+                    <span>Final Turn:</span>
+                    <span>${game.turn}</span>
+                </div>
+                <div class="stat-line">
+                    <span>Total Revenue:</span>
+                    <span>$${Math.floor(game.totalRevenue).toLocaleString()}</span>
+                </div>
+                <div class="stat-line">
+                    <span>Total Expenses:</span>
+                    <span>$${Math.floor(game.totalExpenses).toLocaleString()}</span>
+                </div>
+                <div class="stat-line">
+                    <span>Final Cash:</span>
+                    <span>$${Math.floor(game.cash).toLocaleString()}</span>
+                </div>
+                <div class="stat-line">
+                    <span>Employees:</span>
+                    <span>${game.employees}</span>
+                </div>
+                <div class="stat-line">
+                    <span>Customers:</span>
+                    <span>${Math.floor(game.customers)}</span>
+                </div>
+                <div class="stat-line">
+                    <span>Market Share:</span>
+                    <span>${game.marketShare.toFixed(2)}%</span>
+                </div>
+            `;
+
+            document.getElementById('gameOverTitle').textContent = 
+                result.status === 'bankrupt' ? '💔 Bankruptcy' :
+                result.status === 'insolvent' ? '📉 Insolvency' :
+                result.status === 'acquired' ? '🎉 Acquisition!' :
+                '🎊 Victory!';
+
+            document.getElementById('gameOverStats').innerHTML = stats;
+            document.getElementById('gameOverModal').classList.add('show');
+        }
+
+        // ===== INPUT LISTENERS =====
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputs = [
+                'priceDecision', 'productionDecision', 'hireDecision', 'marketingDecision',
+                'rdDecision', 'salaryDecision', 'debtDecision', 'capexDecision'
+            ];
+
+            inputs.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', (e) => {
+                        const displayId = id.replace('Decision', 'Value');
+                        document.getElementById(displayId).textContent = e.target.value;
+                    });
+                }
+            });
+
+            if (game.hasSave()) {
+                // Show start screen with load option
+            } else {
+                // Show start screen
+            }
+        });
+    </script>
+</body>
+</html>
